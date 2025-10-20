@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="es" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos NOHEMER - Registro de Venta</title>
+    <style>
+        /* Estilos base y mobile-first */
+        :root {
+            --primary-color: #007bff;
+            --background-color: #f4f7f6;
+            --text-color: #333;
+            --input-bg-color: #fff;
+            --success-color: #28a745;
+            --secondary-color: #6c757d;
+            --light-bg: #f8f9fa;
+            --danger-color: #dc3545;
+            --border-color: #ccc;
+            --border-radius: 8px;
+            --spacing-unit: 10px;
+        }
+
+        body.dark-mode {
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --input-bg-color: #1e1e1e;
+            --light-bg: #2a2a2a;
+            --border-color: #444;
+            --secondary-color: #868e96;
+            --primary-color: #3391ff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: var(--input-bg-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-sizing: border-box; /* Importante para el padding */
+            font-size: 16px;
+            background-color: var(--input-bg-color);
+            /* Mejora la apariencia en iOS */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            color: var(--text-color);
+        }
+        
+        /* Flecha personalizada para el select para un look consistente */
+        select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+        }
+
+        body.dark-mode select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+        }
+
+        .add-product-section {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-product-section .form-group {
+            flex: 1;
+            min-width: 150px; /* Evita que se encojan demasiado */
+            margin-bottom: 0;
+        }
+
+        #add-item-btn {
+            padding: 12px 15px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            height: 48px; /* Misma altura que los inputs */
+        }
+
+        .sales-grid {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .sales-grid th, .sales-grid td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sales-grid th {
+            background-color: var(--light-bg);
+        }
+
+        .sales-grid .remove-item-btn {
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        .sale-actions {
+            margin-top: 10px;
+            text-align: right;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .sale-actions button {
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .delete-sale-btn {
+            background-color: var(--danger-color);
+        }
+
+        .share-ticket-btn {
+            background-color: var(--success-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:disabled {
+            background-color: var(--secondary-color);
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .secondary-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .secondary-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #clear-form-btn { background-color: var(--secondary-color); }
+        #close-app-btn { background-color: var(--secondary-color); }
+        #clear-db-btn { background-color: var(--danger-color); }
+
+        .is-loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Estilos para la sección de búsqueda y respaldo */
+        .search-container, .backup-container {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background-color: var(--light-bg);
+        }
+
+        .search-container h2, .backup-container h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+
+        #search-results-container {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .sale-record {
+            background-color: var(--input-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .sale-record:last-child {
+            margin-bottom: 0;
+        }
+
+        .sale-record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sale-record-header h4 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        #close-search-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--secondary-color);
+            padding: 0 5px;
+        }
+
+        #current-sale-total {
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        #bcv-rate-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            flex-grow: 1;
+        }
+
+        #theme-toggle-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        #theme-toggle-btn:hover {
+            background-color: var(--light-bg);
+        }
+
+        #bcv-rate-display {
+            font-weight: 500;
+        }
+
+        #edit-bcv-rate-btn {
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            background-color: var(--secondary-color);
+        }
+
+        /* Estilos para la navegación de pestañas */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .nav-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            color: var(--secondary-color);
+        }
+        .nav-tab.active {
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <div id="bcv-rate-container">
+                <div id="bcv-rate-display">Tasa no establecida.</div>
+                <button type="button" id="edit-bcv-rate-btn">Editar Tasa</button>
+            </div>
+            <button type="button" id="theme-toggle-btn" title="Cambiar tema">🌙</button>
+        </div>
+
+        <div id="main-content" class="hidden">
+            <!-- Pestañas de Navegación -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="sales-view">Ventas</button>
+                <button class="nav-tab" data-tab="inventory-view">Inventario</button>
+            </div>
+
+            <!-- Contenedor para la vista de Ventas -->
+            <div id="sales-view">
+                <div class="search-container">
+                    <h2>Buscar Cliente</h2>
+                    <div class="form-group">
+                        <label for="search-cliente-input">Nombre del Cliente</label>
+                        <input type="text" id="search-cliente-input" placeholder="Escriba el nombre para buscar...">
+                    </div>
+                    <button type="button" id="search-cliente-btn" class="submit-btn" style="margin-top: 0;">Buscar Historial</button>
+                    <button type="button" id="export-csv-btn" class="submit-btn" style="margin-top: 10px; background-color: var(--success-color);">Exportar a CSV</button>
+                    <div id="search-results-container" class="hidden">
+                        <!-- Los resultados de la búsqueda se inyectarán aquí -->
+                    </div>
+                </div>
+    
+                <hr style="border-top: 1px solid var(--secondary-color); margin: 30px 0;">
+    
+                <div class="backup-container">
+                    <h2>Copia de Seguridad</h2>
+                    <div class="secondary-actions">
+                        <button type="button" id="backup-btn" style="background-color: var(--primary-color);">Crear Respaldo</button>
+                        <button type="button" id="restore-btn" style="background-color: var(--success-color);">Restaurar Respaldo</button>
+                        <input type="file" id="restore-file-input" class="hidden" accept=".json,.txt">
+                    </div>
+                </div>
+    
+                <hr style="border-top: 1px solid var(--secondary-color); margin: 30px 0;">
+    
+                <h1 id="main-title" style="margin-top: 0;">Registrar Venta - NOHEMER</h1>
+                <form id="venta-form">
+                    <div class="form-group">
+                        <label for="cliente">Nombre del Cliente</label>
+                        <input type="text" id="cliente" name="cliente" placeholder="Ej: Juan Pérez" required>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="cedula">Cédula del Cliente (Opcional)</label>
+                        <input type="text" id="cedula" name="cedula" placeholder="Ej: V-12345678">
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="fecha">Fecha de Venta</label>
+                        <input type="date" id="fecha" name="fecha" required>
+                    </div>
+    
+                    <hr style="margin: 20px 0;">
+                    <h3 style="text-align: center; margin-bottom: 20px;">Productos de la Venta</h3>
+    
+                    <div class="add-product-section">
+                        <div class="form-group">
+                            <label for="producto-selector">Producto</label>
+                            <select id="producto-selector">
+                                <option value="" disabled selected>Cargando productos...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cantidad-selector">Cantidad (Litros)</label>
+                            <input type="number" id="cantidad-selector" min="0.5" step="0.5" placeholder="Ej: 0.5, 1, 1.5">
+                        </div>
+                        <button type="button" id="add-item-btn">Agregar</button>
+                    </div>
+    
+                    <table class="sales-grid">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th style="text-align: right;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-grid-body">
+                            <!-- Las filas de productos se agregarán aquí con JS -->
+                        </tbody>
+                    </table>
+    
+                    <div id="current-sale-total">Total: $0.00 | 0.00 Bs.</div>
+    
+                    <button type="submit" class="submit-btn">Guardar Venta</button>
+    
+                    <div class="secondary-actions">
+                        <button type="button" id="clear-form-btn">Limpiar Formulario</button>
+                        <button type="button" id="clear-db-btn">Borrar Historial</button>
+                        <button type="button" id="close-app-btn">Cerrar App</button>
+                    </div>
+    
+                </form>
+            </div>
+    
+            <!-- Vista de Inventario (inicialmente oculta) -->
+            <div id="inventory-view" class="hidden">
+                <h2>Gestión de Inventario</h2>
+                
+                <!-- Tabla de Inventario -->
+                <table class="sales-grid">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Stock (Litros)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-grid-body">
+                        <!-- Filas de inventario se agregarán aquí -->
+                    </tbody>
+                </table>
+    
+                <hr style="margin: 30px 0;">
+    
+                <!-- Formulario para agregar stock -->
+                <h3>Añadir Stock a Producto Existente</h3>
+                <form id="add-stock-form" class="add-product-section">
+                    <div class="form-group">
+                        <label for="stock-product-selector">Producto</label>
+                        <select id="stock-product-selector"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock-quantity-input">Cantidad a Añadir</label>
+                        <input type="number" id="stock-quantity-input" min="0" step="any" placeholder="Ej: 20">
+                    </div>
+                    <button type="submit" id="add-stock-btn">Añadir Stock</button>
+                </form>
+    
+                <hr style="margin: 30px 0;">
+    
+                <!-- Formulario para agregar nuevo producto -->
+                <h3>Añadir Nuevo Producto al Sistema</h3>
+                <form id="add-new-product-form">
+                    <input type="text" id="new-product-name" placeholder="Nombre del nuevo producto" required style="margin-bottom: 10px;">
+                    <button type="submit" class="submit-btn" style="margin-top: 0;">Agregar Producto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Cargar la librería Dexie.js para la base de datos local -->
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+
+    <!-- 2. Nuestro código de la aplicación -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- CONFIGURACIÓN DE LA BASE DE DATOS LOCAL ---
+            const db = new Dexie('NohemerVentasDB');
+            // Definir la estructura de la base de datos (versión 2 para inventario)
+            db.version(2).stores({
+                ventas: '++id, cliente, fecha', // ++id es autoincremental, cliente y fecha son índices para buscar
+                inventory: '&productId, productName' // productId es único, productName para búsquedas
+            });
+
+            // --- 1. INICIALIZACIÓN Y VARIABLES GLOBALES ---
+            const form = document.getElementById('venta-form');
+            const clienteInput = document.getElementById('cliente');
+            const cedulaInput = document.getElementById('cedula');
+            const fechaInput = document.getElementById('fecha');
+            const productoSelector = document.getElementById('producto-selector');
+            const cantidadSelector = document.getElementById('cantidad-selector');
+            const addItemBtn = document.getElementById('add-item-btn');
+            const salesGridBody = document.getElementById('sales-grid-body');
+            const clearFormBtn = document.getElementById('clear-form-btn');
+            const clearDbBtn = document.getElementById('clear-db-btn');
+            const closeAppBtn = document.getElementById('close-app-btn');
+            const searchClienteInput = document.getElementById('search-cliente-input');
+            const searchClienteBtn = document.getElementById('search-cliente-btn');
+            const searchResultsContainer = document.getElementById('search-results-container');
+            const exportCsvBtn = document.getElementById('export-csv-btn');
+            const currentSaleTotalEl = document.getElementById('current-sale-total');
+            const editBcvRateBtn = document.getElementById('edit-bcv-rate-btn');
+            const backupBtn = document.getElementById('backup-btn');
+            const restoreBtn = document.getElementById('restore-btn');
+            const restoreFileInput = document.getElementById('restore-file-input');
+            const mainContent = document.getElementById('main-content');
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const inventoryView = document.getElementById('inventory-view');
+            const salesView = document.getElementById('sales-view'); // El contenedor de ventas
+            const navTabs = document.querySelector('.nav-tabs');
+            const inventoryGridBody = document.getElementById('inventory-grid-body');
+            const addStockForm = document.getElementById('add-stock-form');
+            const stockProductSelector = document.getElementById('stock-product-selector');
+            const stockQuantityInput = document.getElementById('stock-quantity-input');
+            const addNewProductForm = document.getElementById('add-new-product-form');
+            const newProductNameInput = document.getElementById('new-product-name');
+            const mainTitle = document.getElementById('main-title');
+
+            // Array para almacenar los productos de la venta actual
+            let ventaItems = [];
+            let productPrices = {}; // Los precios se cargarán desde la DB
+            let currentSearchResults = []; // Para guardar los resultados de la búsqueda actual
+            let bcvRate = 0; // Tasa del BCV
+            
+            // --- FUNCIÓN PARA CARGAR TASA GUARDADA ---
+            function initializeBcvRate() {
+                const savedRate = localStorage.getItem('savedBcvRate');
+                const rate = parseFloat(savedRate);
+
+                if (savedRate && !isNaN(rate) && rate > 0) {
+                    bcvRate = rate;
+                    document.getElementById('bcv-rate-display').innerHTML = `<strong>Tasa del día:</strong> ${bcvRate.toFixed(2)} Bs.`;
+                    mainContent.classList.remove('hidden'); // Mostrar contenido principal
+                    console.log("Tasa cargada desde almacenamiento local:", bcvRate);
+                } else {
+                    document.getElementById('bcv-rate-display').innerHTML = `<strong style="color: var(--danger-color);">POR FAVOR, ESTABLEZCA LA TASA DEL DÍA</strong>`;
+                    mainContent.classList.add('hidden'); // Mantener contenido oculto
+                }
+            }
+
+            // --- FUNCIÓN PARA ACTUALIZAR TASA BCV MANUALMENTE ---
+            function updateBcvRateManually() {
+                const manualRateStr = prompt("Por favor, ingrese la tasa del día (ej: 36.50):", bcvRate > 0 ? bcvRate.toFixed(2) : '');
+
+                if (manualRateStr === null) { // El usuario hizo clic en "Cancelar"
+                    return;
+                }
+
+                // Limpiar y validar la entrada para que sea más robusta
+                const sanitizedRateStr = manualRateStr.replace(',', '.').trim();
+                const manualRate = parseFloat(sanitizedRateStr);
+
+                const rateDisplay = document.getElementById('bcv-rate-display');
+
+                if (manualRate && !isNaN(manualRate) && manualRate > 0) {
+                    bcvRate = manualRate;
+                    localStorage.setItem('savedBcvRate', bcvRate); // Guardar la tasa en el almacenamiento local
+                    rateDisplay.innerHTML = `<strong>Tasa del día:</strong> ${bcvRate.toFixed(2)} Bs.`;
+                    mainContent.classList.remove('hidden'); // Mostrar contenido principal
+                    console.log("Tasa actualizada y guardada:", bcvRate);
+                    // Si hay productos en el carrito, actualiza el total en Bs.
+                    if (ventaItems.length > 0) {
+                        renderSalesGrid();
+                    }
+                } else {
+                    alert("El valor ingresado no es válido. Por favor, use un número positivo.");
+                }
+            }
+            // Establecer fecha actual por defecto
+            function setInitialDate() {
+                const hoy = new Date();
+                const anio = hoy.getFullYear();
+                const mes = String(hoy.getMonth() + 1).padStart(2, '0'); // +1 porque los meses son 0-11
+                const dia = String(hoy.getDate()).padStart(2, '0');
+                fechaInput.value = `${anio}-${mes}-${dia}`;
+            }
+
+            // --- FUNCIONES PARA MANEJAR EL TEMA (MODO CLARO/OSCURO) ---
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    themeToggleBtn.textContent = '☀️'; // Sol para cambiar a modo claro
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeToggleBtn.textContent = '🌙'; // Luna para cambiar a modo oscuro
+                }
+            }
+
+            function toggleTheme() {
+                const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            }
+
+            function initializeTheme() {
+                const savedTheme = localStorage.getItem('theme') || 'light'; // Por defecto, modo claro
+                applyTheme(savedTheme);
+            }
+
+            // --- FUNCIONES DE INVENTARIO ---
+            async function initializeInventory() {
+                const initialProducts = [
+                    { productId: 'desinfectante_cherry', productName: 'Desinfectante Tipo Cherry', stock: 0, price: 1.50 },
+                    { productId: 'jabon_multiuso', productName: 'Jabon Multiuso', stock: 0, price: 1.50 },
+                    { productId: 'cloro', productName: 'Cloro', stock: 0, price: 1.50 }
+                ];
+
+                try {
+                    const count = await db.inventory.count();
+                    if (count === 0) {
+                        console.log("Inicializando inventario por primera vez...");
+                        await db.inventory.bulkAdd(initialProducts);
+                    }
+                    await refreshInventoryData();
+                } catch (error) {
+                    console.error("Error inicializando el inventario:", error);
+                    alert("Hubo un problema al cargar los datos del inventario.");
+                }
+            }
+
+            async function refreshInventoryData() {
+                const products = await db.inventory.toArray();
+                
+                // 1. Renderizar la tabla de inventario
+                inventoryGridBody.innerHTML = '';
+                products.sort((a, b) => a.productName.localeCompare(b.productName)).forEach(p => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${p.productName}</td><td>${p.stock.toFixed(2)}</td>`;
+                    inventoryGridBody.appendChild(row);
+                });
+
+                // 2. Poblar los selectores de productos y precios
+                productoSelector.innerHTML = '<option value="" disabled selected>Seleccione un producto</option>';
+                stockProductSelector.innerHTML = '<option value="" disabled selected>Seleccione un producto</option>';
+                productPrices = {};
+
+                products.forEach(p => {
+                    productPrices[p.productId] = p.price;
+                    const option = `<option value="${p.productId}">${p.productName}</option>`;
+                    productoSelector.innerHTML += option;
+                    stockProductSelector.innerHTML += option;
+                });
+            }
+
+            // --- MANEJO DE PESTAÑAS ---
+            function handleTabClick(e) {
+                if (!e.target.matches('.nav-tab')) return;
+
+                // Ocultar todas las vistas
+                salesView.classList.add('hidden');
+                inventoryView.classList.add('hidden');
+
+                // Quitar clase activa de todas las pestañas
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+
+                // Mostrar la vista y pestaña seleccionada
+                const tabId = e.target.dataset.tab;
+                e.target.classList.add('active');
+
+                if (tabId === 'sales-view') {
+                    salesView.classList.remove('hidden');
+                    mainTitle.textContent = 'Registrar Venta - NOHEMER';
+                } else if (tabId === 'inventory-view') {
+                    inventoryView.classList.remove('hidden');
+                    mainTitle.textContent = 'Gestión de Inventario';
+                }
+            }
+
+            // --- INICIALIZACIÓN DE LA APP ---
+            async function initializeApp() {
+                initializeTheme();
+                setInitialDate();
+                initializeBcvRate(); // Cargar la tasa guardada al iniciar
+                await initializeInventory(); // Cargar o crear inventario
+
+                // Ocultar la vista de inventario por defecto
+                inventoryView.classList.add('hidden');
+                salesView.classList.remove('hidden'); // Asegurarse que la vista de ventas es visible
+            }
+
+            initializeApp();
+
+            editBcvRateBtn.addEventListener('click', updateBcvRateManually);
+            themeToggleBtn.addEventListener('click', toggleTheme);
+            navTabs.addEventListener('click', handleTabClick);
+
+            // Eventos de formularios de inventario
+            addStockForm.addEventListener('submit', handleAddStock);
+            addNewProductForm.addEventListener('submit', handleAddNewProduct);
+
+            backupBtn.addEventListener('click', createBackup);
+            restoreBtn.addEventListener('click', () => restoreFileInput.click());
+            restoreFileInput.addEventListener('change', restoreBackup);
+
+            // --- 2. FUNCIONES AUXILIARES Y DE RENDERIZADO ---
+            function renderSalesGrid() {
+                salesGridBody.innerHTML = ''; // Limpiar la tabla
+                let totalVentaActual = 0;
+
+                ventaItems.forEach((item, index) => {
+                    const subtotalUsd = item.precio * item.cantidad;
+                    totalVentaActual += subtotalUsd;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.nombreProducto}</td>
+                        <td>${item.cantidad}</td>
+                        <td>$${subtotalUsd.toFixed(2)}</td>
+                        <td class="text-right"><button type="button" class="remove-item-btn" data-index="${index}">X</button></td>
+                    `;
+                    salesGridBody.appendChild(row);
+                });
+
+                const totalVentaVes = totalVentaActual * bcvRate;
+                currentSaleTotalEl.textContent = `Total: $${totalVentaActual.toFixed(2)} | ${totalVentaVes.toFixed(2)} Bs.`;
+            }
+
+            function resetForm() {
+                form.reset(); // Limpia inputs de texto, selectores, etc.
+                ventaItems = []; // Vacía el array de items
+                renderSalesGrid(); // Limpia la tabla visualmente y resetea el total                
+                setInitialDate(); // Restablece la fecha
+                searchResultsContainer.classList.add('hidden'); // Oculta resultados de búsqueda
+                clienteInput.focus(); // Pone el cursor en el primer campo, listo para empezar
+            }
+
+            // --- 3. MANEJO DE EVENTOS DEL FORMULARIO DE VENTA ---
+            addItemBtn.addEventListener('click', async () => {
+                const productoId = productoSelector.value;
+                const cantidad = parseFloat(cantidadSelector.value);
+
+                if (!productoId || !cantidad || cantidad < 0.5) {
+                    alert('Por favor, seleccione un producto y una cantidad válida (mínimo 0.5 litros).');
+                    return;
+                }
+
+                // VERIFICAR STOCK ANTES DE AÑADIR
+                const productInStock = await db.inventory.get(productoId);
+                if (cantidad > productInStock.stock) {
+                    alert(`¡Stock insuficiente! Solo quedan ${productInStock.stock.toFixed(2)} litros de ${productInStock.productName}.`);
+                    return;
+                }
+
+                const nombreProducto = productoSelector.options[productoSelector.selectedIndex].text;
+                const precio = productPrices[productoId];
+
+                ventaItems.push({ productoId, nombreProducto, cantidad, precio });
+                renderSalesGrid();
+
+                // Limpiar los campos para el siguiente producto
+                productoSelector.selectedIndex = 0;
+                cantidadSelector.value = '';
+                productoSelector.focus();
+            });
+
+            salesGridBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-item-btn')) {
+                    const indexToRemove = parseInt(e.target.getAttribute('data-index'), 10);
+                    ventaItems.splice(indexToRemove, 1); // Elimina el item del array
+                    renderSalesGrid(); // Vuelve a dibujar la tabla
+                }
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevenimos el envío tradicional
+
+                let totalVentaUsd = 0;
+                ventaItems.forEach(item => {
+                    totalVentaUsd += item.precio * item.cantidad;
+                });
+
+                // VALIDACIÓN FINAL: Prevenir guardar ventas con valores cero.
+                if (totalVentaUsd <= 0 || !bcvRate || bcvRate <= 0) {
+                    alert("Error: No se puede guardar la venta.\n\nVerifique que la tasa del dólar sea correcta y que haya agregado productos al carrito.");
+                    return;
+                }
+                if (!clienteInput.value) {
+                    alert('Por favor, ingrese el nombre del cliente.');
+                    return;
+                }
+                if (ventaItems.length === 0) {
+                    alert('Debe agregar al menos un producto a la venta.');
+                    return;
+                }
+
+                // VERIFICACIÓN DE STOCK FINAL ANTES DE GUARDAR
+                for (const item of ventaItems) {
+                    const productInDb = await db.inventory.get(item.productoId);
+                    if (item.cantidad > productInDb.stock) {
+                        alert(`Error de stock al intentar guardar. La cantidad de "${item.nombreProducto}" (${item.cantidad} L) excede el stock disponible (${productInDb.stock} L). La venta no puede ser procesada.`);
+                        return; // Detiene el proceso de guardado
+                    }
+                }
+
+                // --- 1. Deshabilitar UI para prevenir doble clic ---
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Guardando...';
+                form.classList.add('is-loading');
+
+                // --- 2. Preparar el objeto de la venta ---
+                const totalVentaVes = totalVentaUsd * bcvRate;
+                const ventaFinal = {
+                    cliente: clienteInput.value,
+                    cedula: cedulaInput.value,
+                    fecha: fechaInput.value,
+                    items: ventaItems,
+                    totalUsd: totalVentaUsd,
+                    totalVes: totalVentaVes,
+                    tasaBcv: bcvRate
+                };
+
+                try {
+                    // Guardar la venta y luego actualizar el inventario en una transacción
+                    await db.transaction('rw', db.ventas, db.inventory, async () => {
+                        // 1. Guardar la venta
+                        await db.ventas.add(ventaFinal);
+
+                        // 2. Actualizar el stock por cada item vendido
+                        for (const item of ventaItems) {
+                            await db.inventory.where('productId').equals(item.productoId).modify(p => { p.stock -= item.cantidad });
+                        }
+                    });
+
+                    await refreshInventoryData(); // Actualizar la UI del inventario
+                    if (confirm('Venta guardada con éxito. ¿Desea enviar el ticket por WhatsApp?')) {
+                        // Para generar el ticket, necesitamos el ID que Dexie acaba de crear.
+                        // Lo recuperamos buscando la última venta (no es lo ideal, pero funciona para este caso)
+                        const lastSale = await db.ventas.orderBy('id').last();
+                        const ticketText = generateTicketText(lastSale);
+                        shareOnWhatsApp(ticketText);
+                    }
+                    resetForm();
+                } catch (error) {
+                    console.error("Error al guardar la venta o actualizar inventario: ", error);
+                    alert("Hubo un error al guardar la venta. Revise la consola para más detalles.");
+                } finally {
+                    // --- 4. Reactivar la UI ---
+                    submitButton.disabled = false;
+                    form.classList.remove('is-loading');
+                    submitButton.textContent = 'Guardar Venta';
+                }
+            });
+
+            clearFormBtn.addEventListener('click', () => {
+                if (confirm('¿Está seguro de que desea limpiar todo el formulario?')) {
+                    resetForm();
+                }
+            });
+
+            clearDbBtn.addEventListener('click', async () => {
+                const confirmation = prompt('Esta acción borrará TODO el historial de ventas de forma PERMANENTE. Esto no se puede deshacer.\n\nPara confirmar, escriba la palabra "BORRAR" en mayúsculas:');
+                if (confirmation === 'BORRAR') {
+                    try {
+                        // Ahora también borramos el inventario
+                        await db.ventas.clear();
+                        await db.inventory.clear();
+                        alert('Todo el historial de ventas ha sido eliminado.');
+                        searchResultsContainer.classList.add('hidden');
+                        searchClienteInput.value = '';
+                    } catch (error) {
+                        console.error("Error al borrar el historial: ", error);
+                        alert("Hubo un error al borrar el historial.");
+                    }
+                    await initializeInventory(); // Reinicializar con productos base
+                } else {
+                    alert('Operación cancelada.');
+                }
+            });
+
+            closeAppBtn.addEventListener('click', () => {
+                const hasUnsavedData = ventaItems.length > 0 || clienteInput.value.trim() !== '' || cedulaInput.value.trim() !== '';
+                if (hasUnsavedData) {
+                    if (!confirm('Tiene cambios sin guardar. ¿Está seguro de que desea cerrar?')) {
+                        return; // El usuario canceló, no hacemos nada.
+                    }
+                }
+                alert('La aplicación se cerraría ahora. Puedes cerrar la pestaña del navegador.');
+            });
+
+            // --- 4. MANEJO DE BÚSQUEDA, EXPORTACIÓN Y PROTECCIÓN DE CIERRE ---
+            window.addEventListener('beforeunload', (e) => {
+                const hasUnsavedData = ventaItems.length > 0 || clienteInput.value.trim() !== '' || cedulaInput.value.trim() !== '';
+                if (hasUnsavedData) {
+                    e.preventDefault(); // Requerido por el estándar
+                    e.returnValue = ''; // Requerido por algunos navegadores como Chrome
+                }
+            });
+
+            searchClienteBtn.addEventListener('click', async () => {
+                const searchTerm = searchClienteInput.value.trim();
+                if (!searchTerm) {
+                    alert('Por favor, ingrese un nombre para buscar.');
+                    return;
+                }
+
+                try {
+                    // Dexie.js permite búsquedas flexibles como "que empiece por" ignorando mayúsculas/minúsculas
+                    currentSearchResults = await db.ventas.where("cliente").startsWithIgnoreCase(searchTerm).toArray();
+                } catch (error) {
+                    console.error("Error buscando en la base de datos local: ", error);
+                    alert("Error al realizar la búsqueda.");
+                    return;
+                }
+
+                displaySearchResults(currentSearchResults, searchTerm);
+            });
+
+            function displaySearchResults(sales, clientName) {
+                searchResultsContainer.innerHTML = ''; // Limpiar resultados anteriores
+
+                let content = `<button id="close-search-btn" title="Cerrar búsqueda">&times;</button>`;
+
+                if (sales.length === 0) {
+                    content += `<p>No se encontraron ventas para "<strong>${clientName}</strong>".</p>`;
+                } else {
+                    const consistentClientName = sales[0].cliente; // Usar un nombre consistente para el título
+                    content += `<h4>Historial de Compras de ${consistentClientName}</h4>`;
+                    content += `<p style="font-size: 0.9em; text-align: center; margin-bottom: 15px; color: var(--secondary-color);"><strong>Nota:</strong> El total en Bs. se recalcula con la tasa del día actual (<strong>${bcvRate.toFixed(2)} Bs.</strong>).</p>`;
+
+                    sales.forEach((sale, index) => {
+                        const [year, month, day] = sale.fecha.split('-');
+                        const formattedDate = `${day}/${month}/${year}`;
+
+                        const totalSaleUsd = sale.totalUsd || 0; // El total en USD no cambia
+                        // ¡CAMBIO CLAVE! Recalcular el total en VES con la tasa actual
+                        const totalSaleVesRecalculated = totalSaleUsd * bcvRate;
+                        
+                        let itemsTable = `<table class="sales-grid" style="margin-top: 10px;"><thead><tr><th>Producto</th><th>Cant.</th><th>Subtotal USD</th></tr></thead><tbody>`;
+                        sale.items.forEach(item => {
+                            const subtotalUsd = (item.precio || 0) * item.cantidad;
+                            itemsTable += `<tr><td>${item.nombreProducto}</td><td>${item.cantidad}</td><td>$${subtotalUsd.toFixed(2)}</td></tr>`;
+                        });
+                        itemsTable += `</tbody></table>`;
+                        
+                        const saleContent = `
+                            ${itemsTable}
+                            <div class="sale-actions">
+                                <button type="button" class="share-ticket-btn" data-sale-index="${index}">Compartir Ticket</button>
+                                <button type="button" class="delete-sale-btn" data-sale-id="${sale.id}">Eliminar</button>
+                            </div>
+                        `;
+
+                        content += `
+                            <div class="sale-record">
+                                <div class="sale-record-header">
+                                    <strong>Fecha: ${formattedDate}</strong>
+                                    <strong>Total: $${totalSaleUsd.toFixed(2)} (${totalSaleVesRecalculated.toFixed(2)} Bs)</strong>
+                                </div>
+                                ${saleContent}
+                            </div>
+                        `;
+                    });
+                }
+
+                searchResultsContainer.innerHTML = content;
+                searchResultsContainer.classList.remove('hidden');
+            }
+
+            // Un único manejador de eventos para toda la sección de resultados
+            searchResultsContainer.addEventListener('click', async (e) => {
+                const target = e.target;
+                if (target.id === 'close-search-btn') {
+                    searchResultsContainer.classList.add('hidden');
+                } else if (target.classList.contains('share-ticket-btn')) {
+                    const saleIndex = target.dataset.saleIndex;
+                    shareTicketByIndex(saleIndex);
+                } else if (target.classList.contains('delete-sale-btn')) {
+                    const saleId = parseInt(target.dataset.saleId, 10);
+                    await deleteSale(saleId);
+                }
+            });
+
+            async function deleteSale(saleId) {
+                if (!saleId) return;
+                if (confirm('¿Está seguro de que desea eliminar esta venta de forma permanente?')) {
+                    await db.ventas.delete(saleId);
+                    alert('Venta eliminada con éxito.');
+                    searchClienteBtn.click(); // Refrescar la búsqueda para actualizar la lista
+                }
+            }
+            exportCsvBtn.addEventListener('click', async () => {
+                let allSales = [];
+                try {
+                    allSales = await db.ventas.toArray();
+                } catch (error) {
+                    alert("No se pudo obtener los datos para exportar.");
+                    return;
+                }
+                if (allSales.length === 0) {
+                    alert('No hay ventas para exportar.');
+                    return;
+                }
+
+                const headers = ['Fecha', 'Cliente', 'Cedula', 'ID_Producto', 'Producto', 'Cantidad', 'Precio_USD', 'Subtotal_USD', 'Tasa_BCV', 'Subtotal_VES'];
+                let csvContent = headers.join(',') + '\n';
+
+                allSales.forEach(sale => {
+                    const cliente = `"${sale.cliente.replace(/"/g, '""')}"`; 
+                    const cedula = `"${(sale.cedula || '').replace(/"/g, '""')}"`;
+                    sale.items.forEach(item => {
+                        const subtotalUsd = (item.precio || 0) * item.cantidad;
+                        const subtotalVes = subtotalUsd * (sale.tasaBcv || 0);
+                        const row = [
+                            sale.fecha,
+                            cliente,
+                            cedula,
+                            item.productoId,
+                            `"${item.nombreProducto}"`,
+                            item.cantidad,
+                            (item.precio || 0).toFixed(2),
+                            subtotalUsd.toFixed(2),
+                            (sale.tasaBcv || 0).toFixed(2),
+                            subtotalVes.toFixed(2)
+                        ];
+                        csvContent += row.join(',') + '\n';
+                    });
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'reporte_ventas.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // --- 5. FUNCIONES DE TICKET Y WHATSAPP ---
+            function generateTicketText(sale) {
+                const [year, month, day] = sale.fecha.split('-');                
+                const formattedDate = `${day}/${month}/${year}`;
+                const formattedTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+                let ticket = `*🧾 RECIBO DE COMPRA - NOHEMER*\n`;
+                ticket += `-----------------------------------\n`;
+                ticket += `*Cliente:* ${sale.cliente}\n`;
+                if (sale.cedula && sale.cedula.trim() !== '') {
+                    ticket += `*C.I./RIF:* ${sale.cedula}\n`;
+                }
+                ticket += `*Fecha:* ${formattedDate} - ${formattedTime}\n`;
+                ticket += `*ID Transacción:* ${sale.id}\n`;
+                ticket += `*Tasa del día de la venta:* ${(sale.tasaBcv || 0).toFixed(2)} Bs.\n`;
+                ticket += `-----------------------------------\n\n`;
+                
+                ticket += `*🛒 DETALLE DE LA COMPRA:*\n`;
+                sale.items.forEach(item => {
+                    const subtotalUsd = (item.precio || 0) * item.cantidad;
+                    ticket += `• *${item.cantidad} x ${item.nombreProducto}*\n`;
+                    ticket += `  Subtotal: *$${subtotalUsd.toFixed(2)}*\n`;
+                });
+                
+                ticket += `\n-----------------------------------\n`;
+                
+                // ¡CAMBIO CLAVE! Calcular el total en Bs. con la tasa actual para el cobro
+                const totalVesRecalculated = (sale.totalUsd || 0) * bcvRate;
+
+                ticket += `*TOTAL EN USD (se mantiene):*\n`;
+                ticket += `*💵 $${(sale.totalUsd || 0).toFixed(2)}*\n\n`;
+                ticket += `*MONTO A PAGAR HOY (AJUSTADO):*\n`;
+                ticket += `(Tasa del día: ${bcvRate.toFixed(2)} Bs.)\n`;
+                ticket += `*Bs. ${totalVesRecalculated.toFixed(2)}*\n`;
+
+                ticket += `-----------------------------------\n\n`;
+                
+                ticket += `*🏦 DATOS PARA PAGO MÓVIL:*\n`;
+                ticket += `*Banco:* 0134 - Banesco\n`;
+                ticket += `*Teléfono:* 0412-2012745\n`;
+                ticket += `*C.I:* 13.528.514\n\n`;
+
+                ticket += `*DOCUMENTO NO FISCAL*\n\n`;
+                ticket += `_¡Gracias por su compra!_`;
+
+                return ticket;
+            }
+
+            function shareOnWhatsApp(text) {
+                const encodedText = encodeURIComponent(text);
+                window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+            }
+
+            function shareTicketByIndex(index) {
+                const saleToShare = currentSearchResults[index];
+                if (saleToShare) {
+                    const ticketText = generateTicketText(saleToShare);
+                    shareOnWhatsApp(ticketText);
+                }
+            }
+
+            // --- 6. FUNCIONES DE RESPALDO Y RESTAURACIÓN ---
+            async function createBackup() {
+                try {
+                    // Recopilar datos de ambas tablas
+                    const allSales = await db.ventas.toArray();
+                    const allInventory = await db.inventory.toArray();
+
+                    if (allSales.length === 0 && allInventory.length === 0) {
+                        alert('No hay datos para respaldar.');
+                        return;
+                    }
+
+                    const backupObject = {
+                        ventas: allSales,
+                        inventory: allInventory
+                    };
+
+                    // Convertir los datos a un formato de texto legible (JSON)
+                    const backupData = JSON.stringify(backupObject, null, 2);
+                    const blob = new Blob([backupData], { type: 'application/json;charset=utf-8;' });
+                    
+                    const hoy = new Date();
+                    const fechaArchivo = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `respaldo_nohemer_${fechaArchivo}.json`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    alert('Respaldo creado con éxito. Guarde el archivo en un lugar seguro.');
+
+                } catch (error) {
+                    console.error("Error al crear el respaldo:", error);
+                    alert("Ocurrió un error al crear el respaldo.");
+                }
+            }
+
+            function restoreBackup(event) {
+                const file = event.target.files[0];
+                if (!file) {
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const restoredData = JSON.parse(e.target.result);
+                        // Validar que el objeto de respaldo tenga las propiedades esperadas
+                        if (typeof restoredData !== 'object' || !restoredData.hasOwnProperty('ventas') || !restoredData.hasOwnProperty('inventory')) {
+                            throw new Error("El archivo no tiene el formato correcto.");
+                        }
+
+                        if (confirm('¿Está seguro de que desea restaurar este respaldo? TODOS los datos actuales se reemplazarán.')) {
+                            // Usar una transacción para asegurar que ambas operaciones se completen
+                            await db.transaction('rw', db.ventas, db.inventory, async () => {
+                                await db.ventas.clear();
+                                await db.inventory.clear();
+                                await db.ventas.bulkAdd(restoredData.ventas);
+                                await db.inventory.bulkAdd(restoredData.inventory);
+                            });
+                            await refreshInventoryData(); // Actualizar la UI del inventario
+                            alert(`Restauración completada con éxito. Se cargaron ${restoredData.ventas.length} ventas y ${restoredData.inventory.length} productos.`);
+                        }
+                    } catch (error) {
+                        console.error("Error al restaurar el respaldo:", error);
+                        alert("El archivo de respaldo no es válido o está dañado.");
+                    } finally {
+                        // Limpiar el input para poder seleccionar el mismo archivo otra vez si es necesario
+                        restoreFileInput.value = '';
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // --- 7. MANEJADORES DE EVENTOS DE INVENTARIO ---
+            async function handleAddStock(e) {
+                e.preventDefault();
+                const productId = document.getElementById('stock-product-selector').value;
+                const quantity = parseFloat(document.getElementById('stock-quantity-input').value);
+
+                if (!productId || !quantity || quantity <= 0) {
+                    alert("Por favor, seleccione un producto y una cantidad positiva para añadir.");
+                    return;
+                }
+
+                try {
+                    await db.inventory.where('productId').equals(productId).modify(p => { p.stock += quantity });
+                    alert("Stock actualizado con éxito.");
+                    await refreshInventoryData();
+                    document.getElementById('add-stock-form').reset();
+                } catch (error) {
+                    console.error("Error al añadir stock:", error);
+                    alert("Hubo un error al actualizar el stock.");
+                }
+            }
+
+            async function handleAddNewProduct(e) {
+                e.preventDefault();
+                const newName = document.getElementById('new-product-name').value.trim();
+                if (!newName) {
+                    alert("El nombre del producto no puede estar vacío.");
+                    return;
+                }
+
+                const newPriceStr = prompt(`Ingrese el precio en USD para "${newName}":`, "1.50");
+                const newPrice = parseFloat(newPriceStr.replace(',', '.'));
+
+                if (!newPrice || newPrice <= 0) {
+                    alert("Precio no válido. Operación cancelada.");
+                    return;
+                }
+
+                const newProductId = newName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+
+                try {
+                    await db.inventory.add({ productId: newProductId, productName: newName, stock: 0, price: newPrice });
+                    alert(`Producto "${newName}" agregado con éxito.`);
+                    await refreshInventoryData();
+                    document.getElementById('add-new-product-form').reset();
+                } catch (error) {
+                    console.error("Error al agregar nuevo producto:", error);
+                    alert("Hubo un error al agregar el producto. Es posible que ya exista uno con un ID similar.");
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
