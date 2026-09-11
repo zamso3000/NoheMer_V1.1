@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos NOHEMER - Registro de Venta</title>
+    <title>Registro de Venta</title>
     <style>
         /* Estilos base y mobile-first */
         :root {
@@ -66,6 +66,7 @@
         input[type="text"],
         input[type="number"],
         input[type="date"],
+        input[type="tel"],
         select {
             width: 100%;
             padding: 12px;
@@ -74,6 +75,7 @@
             box-sizing: border-box; /* Importante para el padding */
             font-size: 16px;
             background-color: var(--input-bg-color);
+            color: var(--text-color);
             /* Mejora la apariencia en iOS */
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -157,6 +159,10 @@
             justify-content: flex-end;
         }
 
+        .text-right {
+            text-align: right;
+        }
+
         .sale-actions button {
             padding: 8px 12px;
             border-radius: var(--border-radius);
@@ -173,6 +179,37 @@
 
         .share-ticket-btn {
             background-color: var(--success-color);
+        }
+
+        .sale-actions .print-ticket-btn {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .edit-product-btn,
+        .delete-product-btn {
+            padding: 6px 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 13px;
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .edit-product-btn {
+            background-color: var(--primary-color);
+        }
+
+        .delete-product-btn {
+            background-color: var(--danger-color);
+        }
+
+        .inventory-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
         }
 
         .submit-btn {
@@ -356,54 +393,145 @@
             color: var(--primary-color);
             font-weight: 600;
         }
+
+        /* Estilos para el modal de configuración de empresa */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background-color: var(--input-bg-color);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            max-width: 420px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+        }
+
+        #empresa-display {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        #clock-display {
+            font-size: 0.85em;
+            color: var(--secondary-color);
+            margin-bottom: 4px;
+        }
+
+        .modal-overlay.hidden {
+            display: none !important;
+        }
+
+        /* Área de impresión de tickets de caja */
+        #print-area {
+            display: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area,
+            #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                display: block;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 15px;
+                font-family: 'Courier New', Courier, monospace;
+            }
+            #print-area .ticket-line {
+                text-align: center;
+                margin: 2px 0;
+            }
+            #print-area .ticket-title {
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                margin: 6px 0;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="app-header">
             <div id="bcv-rate-container">
-                <div id="bcv-rate-display">Tasa no establecida.</div>
-                <button type="button" id="edit-bcv-rate-btn">Editar Tasa</button>
+                <div>
+                    <div id="empresa-display"><strong>NOHEMER</strong></div>
+                    <div id="clock-display"></div>
+                    <div id="bcv-rate-display">Tasa no establecida.</div>
+                </div>
+                <button type="button" id="edit-config-btn">Configuración</button>
             </div>
             <button type="button" id="theme-toggle-btn" title="Cambiar tema">🌙</button>
+        </div>
+
+        <!-- Modal de Configuración de Empresa y Tasa -->
+        <div id="config-modal" class="modal-overlay hidden">
+            <div class="modal">
+                <h2>Configuración de la Empresa</h2>
+                <p style="text-align:center; color: var(--secondary-color); font-size: 0.9em;">Configure el nombre de su empresa y la tasa del dólar del día para comenzar.</p>
+                <div class="form-group">
+                    <label for="config-empresa-input">Nombre de la Empresa / Corporación / Distribuidor</label>
+                    <input type="text" id="config-empresa-input" placeholder="Ej: Distribuidora NOHEMER">
+                </div>
+                <div class="form-group">
+                    <label for="config-rif-input">RIF o Cédula de la Empresa (Opcional)</label>
+                    <input type="text" id="config-rif-input" placeholder="Ej: J-12345678-9">
+                </div>
+                <div class="form-group">
+                    <label for="config-direccion-input">Dirección (Opcional)</label>
+                    <input type="text" id="config-direccion-input" placeholder="Ej: Av. Principal, local 1">
+                </div>
+                <div class="form-group">
+                    <label for="config-telefono-input">Teléfono de Contacto (Opcional)</label>
+                    <input type="tel" id="config-telefono-input" placeholder="Ej: 0412-1234567">
+                </div>
+                <div class="form-group">
+                    <label for="config-tasa-input">Tasa del Dólar Actual (Bs.)</label>
+                    <input type="number" id="config-tasa-input" step="0.01" min="0" placeholder="Ej: 36.50">
+                </div>
+                <button type="button" id="config-save-btn" class="submit-btn" style="margin-top: 0;">Guardar y Continuar</button>
+            </div>
         </div>
 
         <div id="main-content" class="hidden">
             <!-- Pestañas de Navegación -->
             <div class="nav-tabs">
                 <button class="nav-tab active" data-tab="sales-view">Ventas</button>
+                <button class="nav-tab" data-tab="search-view">Buscar Cliente</button>
                 <button class="nav-tab" data-tab="inventory-view">Inventario</button>
+                <button class="nav-tab" data-tab="backup-view">Copia de Seguridad</button>
+                <button class="nav-tab" data-tab="ventas-view">Historial de Ventas</button>
             </div>
 
             <!-- Contenedor para la vista de Ventas -->
             <div id="sales-view">
-                <div class="search-container">
-                    <h2>Buscar Cliente</h2>
-                    <div class="form-group">
-                        <label for="search-cliente-input">Nombre del Cliente</label>
-                        <input type="text" id="search-cliente-input" placeholder="Escriba el nombre para buscar...">
-                    </div>
-                    <button type="button" id="search-cliente-btn" class="submit-btn" style="margin-top: 0;">Buscar Historial</button>
-                    <button type="button" id="export-csv-btn" class="submit-btn" style="margin-top: 10px; background-color: var(--success-color);">Exportar a CSV</button>
-                    <div id="search-results-container" class="hidden">
-                        <!-- Los resultados de la búsqueda se inyectarán aquí -->
-                    </div>
-                </div>
-    
-                <hr style="border-top: 1px solid var(--secondary-color); margin: 30px 0;">
-    
-                <div class="backup-container">
-                    <h2>Copia de Seguridad</h2>
-                    <div class="secondary-actions">
-                        <button type="button" id="backup-btn" style="background-color: var(--primary-color);">Crear Respaldo</button>
-                        <button type="button" id="restore-btn" style="background-color: var(--success-color);">Restaurar Respaldo</button>
-                        <input type="file" id="restore-file-input" class="hidden" accept=".json,.txt">
-                    </div>
-                </div>
-    
-                <hr style="border-top: 1px solid var(--secondary-color); margin: 30px 0;">
-    
-                <h1 id="main-title" style="margin-top: 0;">Registrar Venta - NOHEMER</h1>
+                <h1 id="main-title" style="margin-top: 0;">Registrar Venta</h1>
                 <form id="venta-form">
                     <div class="form-group">
                         <label for="cliente">Nombre del Cliente</label>
@@ -418,6 +546,19 @@
                     <div class="form-group">
                         <label for="fecha">Fecha de Venta</label>
                         <input type="date" id="fecha" name="fecha" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipo-pago">Tipo de Pago</label>
+                        <select id="tipo-pago" required>
+                            <option value="" disabled selected>Seleccione el tipo de pago...</option>
+                            <option value="Pago Movil">Pago Móvil</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Zelle">Zelle</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Punto de Venta">Punto de Venta</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                     </div>
     
                     <hr style="margin: 20px 0;">
@@ -453,7 +594,7 @@
     
                     <div id="current-sale-total">Total: $0.00 | 0.00 Bs.</div>
     
-                    <button type="submit" class="submit-btn">Guardar Venta</button>
+                    <button type="submit" class="submit-btn">Registrar Venta</button>
     
                     <div class="secondary-actions">
                         <button type="button" id="clear-form-btn">Limpiar Formulario</button>
@@ -463,7 +604,35 @@
     
                 </form>
             </div>
-    
+
+            <!-- Vista de Búsqueda de Clientes -->
+            <div id="search-view" class="hidden">
+                <div class="search-container">
+                    <h2>Buscar Cliente</h2>
+                    <div class="form-group">
+                        <label for="search-cliente-input">Nombre del Cliente</label>
+                        <input type="text" id="search-cliente-input" placeholder="Escriba el nombre para buscar...">
+                    </div>
+                    <button type="button" id="search-cliente-btn" class="submit-btn" style="margin-top: 0;">Buscar Historial</button>
+                    <button type="button" id="export-csv-btn" class="submit-btn" style="margin-top: 10px; background-color: var(--success-color);">Exportar a CSV</button>
+                    <div id="search-results-container" class="hidden">
+                        <!-- Los resultados de la búsqueda se inyectarán aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista de Copia de Seguridad -->
+            <div id="backup-view" class="hidden">
+                <div class="backup-container">
+                    <h2>Copia de Seguridad</h2>
+                    <div class="secondary-actions">
+                        <button type="button" id="backup-btn" style="background-color: var(--primary-color);">Crear Respaldo</button>
+                        <button type="button" id="restore-btn" style="background-color: var(--success-color);">Restaurar Respaldo</button>
+                        <input type="file" id="restore-file-input" class="hidden" accept=".json,.txt">
+                    </div>
+                </div>
+            </div>
+
             <!-- Vista de Inventario (inicialmente oculta) -->
             <div id="inventory-view" class="hidden">
                 <h2>Gestión de Inventario</h2>
@@ -473,7 +642,9 @@
                     <thead>
                         <tr>
                             <th>Producto</th>
+                            <th>Precio</th>
                             <th>Stock (Litros)</th>
+                            <th style="text-align: right;">Acción</th>
                         </tr>
                     </thead>
                     <tbody id="inventory-grid-body">
@@ -506,6 +677,34 @@
                     <button type="submit" class="submit-btn" style="margin-top: 0;">Agregar Producto</button>
                 </form>
             </div>
+
+            <!-- Vista de Ventas Realizadas (mapeo del archivo JSON guardado) -->
+            <div id="ventas-view" class="hidden">
+                <h2>Ventas Realizadas</h2>
+                <div class="secondary-actions">
+                    <button type="button" id="refresh-ventas-btn" style="background-color: var(--success-color);">Actualizar</button>
+                    <button type="button" id="load-json-btn" style="background-color: var(--primary-color);">Cargar desde JSON</button>
+                    <input type="file" id="json-file-input" class="hidden" accept=".json">
+                </div>
+                <p id="ventas-view-note" style="font-size: 0.9em; color: var(--secondary-color);">Cargando ventas...</p>
+                <div id="ventas-list-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área de impresión de ticket de caja -->
+    <div id="print-area"></div>
+
+    <!-- Modal de opciones del ticket -->
+    <div id="ticket-options-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <h2>Ticket de la Venta</h2>
+            <p id="ticket-options-total" style="text-align:center; font-weight:bold; font-size:1.1em; margin-bottom:16px;"></p>
+            <div class="secondary-actions">
+                <button type="button" id="ticket-whatsapp-btn" style="background-color: var(--success-color);">Enviar por WhatsApp</button>
+                <button type="button" id="ticket-print-btn" style="background-color: var(--primary-color);">Imprimir Ticket</button>
+            </div>
+            <button type="button" id="ticket-close-btn" class="submit-btn" style="margin-top: 10px; background-color: var(--secondary-color);">Continuar</button>
         </div>
     </div>
 
@@ -519,9 +718,10 @@
             // --- CONFIGURACIÓN DE LA BASE DE DATOS LOCAL ---
             const db = new Dexie('NohemerVentasDB');
             // Definir la estructura de la base de datos (versión 2 para inventario)
-            db.version(2).stores({
+            db.version(3).stores({
                 ventas: '++id, cliente, fecha', // ++id es autoincremental, cliente y fecha son índices para buscar
-                inventory: '&productId, productName' // productId es único, productName para búsquedas
+                inventory: '&productId, productName', // productId es único, productName para búsquedas
+                configuracion: 'key' // Para guardar el acceso al archivo JSON en Descargas
             });
 
             // --- 1. INICIALIZACIÓN Y VARIABLES GLOBALES ---
@@ -529,6 +729,7 @@
             const clienteInput = document.getElementById('cliente');
             const cedulaInput = document.getElementById('cedula');
             const fechaInput = document.getElementById('fecha');
+            const tipoPagoInput = document.getElementById('tipo-pago');
             const productoSelector = document.getElementById('producto-selector');
             const cantidadSelector = document.getElementById('cantidad-selector');
             const addItemBtn = document.getElementById('add-item-btn');
@@ -541,13 +742,16 @@
             const searchResultsContainer = document.getElementById('search-results-container');
             const exportCsvBtn = document.getElementById('export-csv-btn');
             const currentSaleTotalEl = document.getElementById('current-sale-total');
-            const editBcvRateBtn = document.getElementById('edit-bcv-rate-btn');
+            const editConfigBtn = document.getElementById('edit-config-btn');
             const backupBtn = document.getElementById('backup-btn');
             const restoreBtn = document.getElementById('restore-btn');
             const restoreFileInput = document.getElementById('restore-file-input');
             const mainContent = document.getElementById('main-content');
             const themeToggleBtn = document.getElementById('theme-toggle-btn');
             const inventoryView = document.getElementById('inventory-view');
+            const searchView = document.getElementById('search-view');
+            const backupView = document.getElementById('backup-view');
+            const clockDisplay = document.getElementById('clock-display');
             const salesView = document.getElementById('sales-view'); // El contenedor de ventas
             const navTabs = document.querySelector('.nav-tabs');
             const inventoryGridBody = document.getElementById('inventory-grid-body');
@@ -557,56 +761,267 @@
             const addNewProductForm = document.getElementById('add-new-product-form');
             const newProductNameInput = document.getElementById('new-product-name');
             const mainTitle = document.getElementById('main-title');
+            const configModal = document.getElementById('config-modal');
+            const configEmpresaInput = document.getElementById('config-empresa-input');
+            const configTasaInput = document.getElementById('config-tasa-input');
+            const configSaveBtn = document.getElementById('config-save-btn');
+            const configRifInput = document.getElementById('config-rif-input');
+            const configDireccionInput = document.getElementById('config-direccion-input');
+            const configTelefonoInput = document.getElementById('config-telefono-input');
+            const ventasView = document.getElementById('ventas-view');
+            const ventasListContainer = document.getElementById('ventas-list-container');
+            const refreshVentasBtn = document.getElementById('refresh-ventas-btn');
+            const loadJsonBtn = document.getElementById('load-json-btn');
+            const jsonFileInput = document.getElementById('json-file-input');
+            const ventasViewNote = document.getElementById('ventas-view-note');
+            const printArea = document.getElementById('print-area');
+            const ticketOptionsModal = document.getElementById('ticket-options-modal');
+            const ticketOptionsTotal = document.getElementById('ticket-options-total');
+            const ticketWhatsappBtn = document.getElementById('ticket-whatsapp-btn');
+            const ticketPrintBtn = document.getElementById('ticket-print-btn');
+            const ticketCloseBtn = document.getElementById('ticket-close-btn');
+            let pendingTicketSale = null;
+            let currentVentasViewSales = [];
 
             // Array para almacenar los productos de la venta actual
             let ventaItems = [];
             let productPrices = {}; // Los precios se cargarán desde la DB
             let currentSearchResults = []; // Para guardar los resultados de la búsqueda actual
             let bcvRate = 0; // Tasa del BCV
-            
-            // --- FUNCIÓN PARA CARGAR TASA GUARDADA ---
-            function initializeBcvRate() {
-                const savedRate = localStorage.getItem('savedBcvRate');
-                const rate = parseFloat(savedRate);
+            let empresaName = getSavedEmpresaName(); // Nombre de la empresa configurada
 
-                if (savedRate && !isNaN(rate) && rate > 0) {
-                    bcvRate = rate;
-                    document.getElementById('bcv-rate-display').innerHTML = `<strong>Tasa del día:</strong> ${bcvRate.toFixed(2)} Bs.`;
-                    mainContent.classList.remove('hidden'); // Mostrar contenido principal
-                    console.log("Tasa cargada desde almacenamiento local:", bcvRate);
-                } else {
-                    document.getElementById('bcv-rate-display').innerHTML = `<strong style="color: var(--danger-color);">POR FAVOR, ESTABLEZCA LA TASA DEL DÍA</strong>`;
-                    mainContent.classList.add('hidden'); // Mantener contenido oculto
+            // --- FUNCIONES PARA LA CONFIGURACIÓN DE EMPRESA Y TASA ---
+            function storageGet(key) {
+                try {
+                    return localStorage.getItem(key);
+                } catch (error) {
+                    console.warn("Almacenamiento local no disponible:", error);
+                    return null;
                 }
             }
 
-            // --- FUNCIÓN PARA ACTUALIZAR TASA BCV MANUALMENTE ---
-            function updateBcvRateManually() {
-                const manualRateStr = prompt("Por favor, ingrese la tasa del día (ej: 36.50):", bcvRate > 0 ? bcvRate.toFixed(2) : '');
+            function storageSet(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (error) {
+                    console.warn("Almacenamiento local no disponible:", error);
+                }
+            }
 
-                if (manualRateStr === null) { // El usuario hizo clic en "Cancelar"
+            function getSavedEmpresaName() {
+                const saved = storageGet('empresaName');
+                return (saved && saved.trim() !== '') ? saved : 'NOHEMER';
+            }
+
+            function getCompanyExtraData(sale) {
+                return {
+                    rif: (sale && sale.empresaRif) || storageGet('empresaRif') || '',
+                    direccion: (sale && sale.empresaDireccion) || storageGet('empresaDireccion') || '',
+                    telefono: (sale && sale.empresaTelefono) || storageGet('empresaTelefono') || ''
+                };
+            }
+
+            function updateBcvRateDisplay() {
+                const rateDisplay = document.getElementById('bcv-rate-display');
+                if (bcvRate && bcvRate > 0) {
+                    rateDisplay.innerHTML = `<strong>Tasa del día:</strong> ${bcvRate.toFixed(2)} Bs.`;
+                } else {
+                    rateDisplay.innerHTML = `<strong style="color: var(--danger-color);">POR FAVOR, ESTABLEZCA LA TASA DEL DÍA</strong>`;
+                }
+            }
+
+            function applyConfigToUI() {
+                empresaName = getSavedEmpresaName();
+                document.title = `Productos ${empresaName} - Registro de Venta`;
+                document.getElementById('empresa-display').textContent = empresaName;
+                mainTitle.textContent = `Registrar Venta - ${empresaName}`;
+                updateBcvRateDisplay();
+            }
+
+            // --- FUNCIÓN PARA MOSTRAR EL MODAL DE CONFIGURACIÓN AL INICIAR ---
+            function openConfigModal() {
+                configEmpresaInput.value = getSavedEmpresaName();
+                configRifInput.value = storageGet('empresaRif') || '';
+                configDireccionInput.value = storageGet('empresaDireccion') || '';
+                configTelefonoInput.value = storageGet('empresaTelefono') || '';
+                const savedRate = storageGet('savedBcvRate');
+                const rate = parseFloat(savedRate);
+                configTasaInput.value = (savedRate && !isNaN(rate) && rate > 0) ? rate.toFixed(2) : '';
+                configModal.classList.remove('hidden');
+                configEmpresaInput.focus();
+            }
+
+            // --- FUNCIÓN PARA GUARDAR LA CONFIGURACIÓN ---
+            async function handleConfigSave() {
+                const name = configEmpresaInput.value.trim();
+                if (!name) {
+                    alert("Por favor, ingrese el nombre de la empresa / corporación / distribuidor.");
+                    configEmpresaInput.focus();
                     return;
                 }
 
-                // Limpiar y validar la entrada para que sea más robusta
-                const sanitizedRateStr = manualRateStr.replace(',', '.').trim();
-                const manualRate = parseFloat(sanitizedRateStr);
-
-                const rateDisplay = document.getElementById('bcv-rate-display');
-
-                if (manualRate && !isNaN(manualRate) && manualRate > 0) {
-                    bcvRate = manualRate;
-                    localStorage.setItem('savedBcvRate', bcvRate); // Guardar la tasa en el almacenamiento local
-                    rateDisplay.innerHTML = `<strong>Tasa del día:</strong> ${bcvRate.toFixed(2)} Bs.`;
-                    mainContent.classList.remove('hidden'); // Mostrar contenido principal
-                    console.log("Tasa actualizada y guardada:", bcvRate);
-                    // Si hay productos en el carrito, actualiza el total en Bs.
-                    if (ventaItems.length > 0) {
-                        renderSalesGrid();
-                    }
-                } else {
-                    alert("El valor ingresado no es válido. Por favor, use un número positivo.");
+                const sanitizedRateStr = configTasaInput.value.replace(',', '.').trim();
+                const rate = parseFloat(sanitizedRateStr);
+                if (!rate || isNaN(rate) || rate <= 0) {
+                    alert("El valor de la tasa no es válido. Por favor, use un número positivo.");
+                    configTasaInput.focus();
+                    return;
                 }
+
+                empresaName = name;
+                bcvRate = rate;
+                storageSet('empresaName', empresaName);
+                storageSet('savedBcvRate', bcvRate);
+                storageSet('empresaRif', configRifInput.value.trim());
+                storageSet('empresaDireccion', configDireccionInput.value.trim());
+                storageSet('empresaTelefono', configTelefonoInput.value.trim());
+
+                applyConfigToUI();
+                configModal.classList.add('hidden');
+                mainContent.classList.remove('hidden'); // Mostrar contenido principal
+                console.log("Configuración guardada:", { empresaName, bcvRate });
+
+                // Si hay productos en el carrito, actualiza el total en Bs.
+                if (ventaItems.length > 0) {
+                    renderSalesGrid();
+                }
+
+                // Crear o actualizar el archivo JSON en la carpeta de Descargas
+                await saveJsonFile();
+            }
+
+            // --- FUNCIONES PARA EL ARCHIVO JSON EN DESCARGAS ---
+            function slugify(name) {
+                return name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '') || 'empresa';
+            }
+
+            async function getStoredFileHandle() {
+                try {
+                    const rec = await db.configuracion.get({ key: 'jsonFileHandle' });
+                    return rec ? rec.value : undefined;
+                } catch (error) {
+                    console.warn("No se pudo recuperar el acceso al archivo JSON:", error);
+                    return undefined;
+                }
+            }
+
+            async function storeFileHandle(handle) {
+                try {
+                    await db.configuracion.put({ key: 'jsonFileHandle', value: handle });
+                } catch (error) {
+                    console.warn("No se pudo guardar el acceso al archivo JSON:", error);
+                }
+            }
+
+            async function ensureFilePermission(handle) {
+                try {
+                    if (!handle) return false;
+                    let perm = await handle.queryPermission({ mode: 'readwrite' });
+                    if (perm === 'prompt') {
+                        perm = await handle.requestPermission({ mode: 'readwrite' });
+                    }
+                    return perm === 'granted';
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            async function buildJsonData() {
+                const allSales = await db.ventas.toArray();
+                const allInventory = await db.inventory.toArray();
+                return {
+                    empresa: {
+                        nombre: empresaName,
+                        rif: storageGet('empresaRif') || '',
+                        direccion: storageGet('empresaDireccion') || '',
+                        telefono: storageGet('empresaTelefono') || ''
+                    },
+                    tasaDolar: bcvRate,
+                    ultimaActualizacion: new Date().toISOString(),
+                    inventario: allInventory.map(p => ({
+                        producto: p.productName,
+                        precio: p.price,
+                        stock: p.stock
+                    })),
+                    ventas: allSales.map(sale => ({
+                        id: sale.id,
+                        empresa: sale.empresaName || empresaName,
+                        empresaRif: sale.empresaRif || '',
+                        empresaDireccion: sale.empresaDireccion || '',
+                        empresaTelefono: sale.empresaTelefono || '',
+                        cliente: sale.cliente,
+                        cedula: sale.cedula || '',
+                        fecha: sale.fecha,
+                        tipoPago: sale.tipoPago || '',
+                        items: sale.items,
+                        totalUsd: sale.totalUsd,
+                        totalVes: sale.totalVes,
+                        tasaBcv: sale.tasaBcv
+                    }))
+                };
+            }
+
+            function downloadJsonFallback(data) {
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                link.download = `registro_${slugify(empresaName)}_ventas.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
+            async function writeJsonToFile(handle, data) {
+                const writable = await handle.createWritable();
+                await writable.write(JSON.stringify(data, null, 2));
+                await writable.close();
+            }
+
+            // Crea o actualiza el archivo JSON en la carpeta de Descargas
+            async function saveJsonFile() {
+                let data;
+                try {
+                    data = await buildJsonData();
+                } catch (error) {
+                    console.warn("No se pudo generar el contenido del JSON:", error);
+                    return;
+                }
+                let handle = await getStoredFileHandle();
+
+                if (handle && (await ensureFilePermission(handle))) {
+                    await storeFileHandle(handle);
+                    try {
+                        await writeJsonToFile(handle, data);
+                        console.log("JSON actualizado en Descargas:", data);
+                        return;
+                    } catch (error) {
+                        console.warn("Error al escribir el archivo JSON:", error);
+                    }
+                }
+
+                // Si no hay acceso guardado, pedir al usuario que elija dónde guardarlo
+                if (window.showSaveFilePicker) {
+                    try {
+                        handle = await window.showSaveFilePicker({
+                            suggestedName: `registro_${slugify(empresaName)}_ventas.json`,
+                            types: [{ description: 'Archivo JSON', accept: { 'application/json': ['.json'] } }]
+                        });
+                        await storeFileHandle(handle);
+                        await writeJsonToFile(handle, data);
+                        console.log("JSON creado (elegido por el usuario):", data);
+                        return;
+                    } catch (error) {
+                        if (error.name === 'AbortError') {
+                            return; // El usuario canceló el diálogo; no forzar descarga
+                        }
+                        console.warn("No se pudo guardar el archivo JSON seleccionado:", error);
+                    }
+                }
+
+                // Último recurso: descargar el JSON automáticamente
+                downloadJsonFallback(data);
             }
             // Establecer fecha actual por defecto
             function setInitialDate() {
@@ -631,13 +1046,22 @@
             function toggleTheme() {
                 const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                localStorage.setItem('theme', newTheme);
+                storageSet('theme', newTheme);
                 applyTheme(newTheme);
             }
 
             function initializeTheme() {
-                const savedTheme = localStorage.getItem('theme') || 'light'; // Por defecto, modo claro
+                const savedTheme = storageGet('theme') || 'light'; // Por defecto, modo claro
                 applyTheme(savedTheme);
+            }
+
+            // --- RELOJ Y FECHA ACTUAL ---
+            function updateClock() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('es-VE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                const timeStr = now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const dateCapitalized = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+                clockDisplay.textContent = `${dateCapitalized} - ${timeStr}`;
             }
 
             // --- FUNCIONES DE INVENTARIO ---
@@ -668,7 +1092,17 @@
                 inventoryGridBody.innerHTML = '';
                 products.sort((a, b) => a.productName.localeCompare(b.productName)).forEach(p => {
                     const row = document.createElement('tr');
-                    row.innerHTML = `<td>${p.productName}</td><td>${p.stock.toFixed(2)}</td>`;
+                    row.innerHTML = `
+                        <td>${p.productName}</td>
+                        <td>$${(p.price || 0).toFixed(2)}</td>
+                        <td>${p.stock.toFixed(2)}</td>
+                        <td class="text-right">
+                            <div class="inventory-actions">
+                                <button type="button" class="edit-product-btn" data-product-id="${p.productId}">Editar</button>
+                                <button type="button" class="delete-product-btn" data-product-id="${p.productId}">Eliminar</button>
+                            </div>
+                        </td>
+                    `;
                     inventoryGridBody.appendChild(row);
                 });
 
@@ -691,7 +1125,10 @@
 
                 // Ocultar todas las vistas
                 salesView.classList.add('hidden');
+                searchView.classList.add('hidden');
                 inventoryView.classList.add('hidden');
+                backupView.classList.add('hidden');
+                ventasView.classList.add('hidden');
 
                 // Quitar clase activa de todas las pestañas
                 document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
@@ -702,10 +1139,20 @@
 
                 if (tabId === 'sales-view') {
                     salesView.classList.remove('hidden');
-                    mainTitle.textContent = 'Registrar Venta - NOHEMER';
+                    mainTitle.textContent = `Registrar Venta - ${empresaName}`;
+                } else if (tabId === 'search-view') {
+                    searchView.classList.remove('hidden');
+                    mainTitle.textContent = 'Buscar Cliente';
                 } else if (tabId === 'inventory-view') {
                     inventoryView.classList.remove('hidden');
                     mainTitle.textContent = 'Gestión de Inventario';
+                } else if (tabId === 'backup-view') {
+                    backupView.classList.remove('hidden');
+                    mainTitle.textContent = 'Copia de Seguridad';
+                } else if (tabId === 'ventas-view') {
+                    ventasView.classList.remove('hidden');
+                    mainTitle.textContent = 'Ventas Realizadas';
+                    loadSalesView(); // Cargar las ventas desde el JSON guardado
                 }
             }
 
@@ -713,23 +1160,46 @@
             async function initializeApp() {
                 initializeTheme();
                 setInitialDate();
-                initializeBcvRate(); // Cargar la tasa guardada al iniciar
+                updateClock(); // Mostrar fecha y hora actual
+                setInterval(updateClock, 1000); // Actualizar el reloj cada segundo
+                openConfigModal(); // Pedir nombre de la empresa y tasa del dólar al iniciar
                 await initializeInventory(); // Cargar o crear inventario
 
-                // Ocultar la vista de inventario por defecto
+                // Ocultar las vistas de inventario, búsqueda, respaldo e historial por defecto
                 inventoryView.classList.add('hidden');
+                searchView.classList.add('hidden');
+                backupView.classList.add('hidden');
+                ventasView.classList.add('hidden');
                 salesView.classList.remove('hidden'); // Asegurarse que la vista de ventas es visible
             }
 
             initializeApp();
 
-            editBcvRateBtn.addEventListener('click', updateBcvRateManually);
+            editConfigBtn.addEventListener('click', openConfigModal);
+            configSaveBtn.addEventListener('click', handleConfigSave);
+            refreshVentasBtn.addEventListener('click', loadSalesView);
+            loadJsonBtn.addEventListener('click', () => jsonFileInput.click());
+            jsonFileInput.addEventListener('change', handleJsonFileSelect);
+            ticketWhatsappBtn.addEventListener('click', () => {
+                if (pendingTicketSale) {
+                    shareOnWhatsApp(generateTicketText(pendingTicketSale));
+                }
+                closeTicketOptions();
+            });
+            ticketPrintBtn.addEventListener('click', () => {
+                if (pendingTicketSale) {
+                    printTicket(pendingTicketSale);
+                }
+                closeTicketOptions();
+            });
+            ticketCloseBtn.addEventListener('click', closeTicketOptions);
             themeToggleBtn.addEventListener('click', toggleTheme);
             navTabs.addEventListener('click', handleTabClick);
 
             // Eventos de formularios de inventario
             addStockForm.addEventListener('submit', handleAddStock);
             addNewProductForm.addEventListener('submit', handleAddNewProduct);
+            inventoryGridBody.addEventListener('click', handleInventoryAction);
 
             backupBtn.addEventListener('click', createBackup);
             restoreBtn.addEventListener('click', () => restoreFileInput.click());
@@ -824,6 +1294,11 @@
                     alert('Debe agregar al menos un producto a la venta.');
                     return;
                 }
+                if (!tipoPagoInput.value) {
+                    alert('Por favor, seleccione el tipo de pago de la venta.');
+                    tipoPagoInput.focus();
+                    return;
+                }
 
                 // VERIFICACIÓN DE STOCK FINAL ANTES DE GUARDAR
                 for (const item of ventaItems) {
@@ -837,15 +1312,20 @@
                 // --- 1. Deshabilitar UI para prevenir doble clic ---
                 const submitButton = form.querySelector('button[type="submit"]');
                 submitButton.disabled = true;
-                submitButton.textContent = 'Guardando...';
+                submitButton.textContent = 'Registrando...';
                 form.classList.add('is-loading');
 
                 // --- 2. Preparar el objeto de la venta ---
                 const totalVentaVes = totalVentaUsd * bcvRate;
                 const ventaFinal = {
+                    empresaName: empresaName,
+                    empresaRif: storageGet('empresaRif') || '',
+                    empresaDireccion: storageGet('empresaDireccion') || '',
+                    empresaTelefono: storageGet('empresaTelefono') || '',
                     cliente: clienteInput.value,
                     cedula: cedulaInput.value,
                     fecha: fechaInput.value,
+                    tipoPago: tipoPagoInput.value,
                     items: ventaItems,
                     totalUsd: totalVentaUsd,
                     totalVes: totalVentaVes,
@@ -865,13 +1345,11 @@
                     });
 
                     await refreshInventoryData(); // Actualizar la UI del inventario
-                    if (confirm('Venta guardada con éxito. ¿Desea enviar el ticket por WhatsApp?')) {
-                        // Para generar el ticket, necesitamos el ID que Dexie acaba de crear.
-                        // Lo recuperamos buscando la última venta (no es lo ideal, pero funciona para este caso)
-                        const lastSale = await db.ventas.orderBy('id').last();
-                        const ticketText = generateTicketText(lastSale);
-                        shareOnWhatsApp(ticketText);
-                    }
+                    await saveJsonFile(); // Actualizar el registro JSON en Descargas
+
+                    // Ofrecer opciones del ticket (WhatsApp / Imprimir)
+                    const lastSale = await db.ventas.orderBy('id').last();
+                    openTicketOptions(lastSale);
                     resetForm();
                 } catch (error) {
                     console.error("Error al guardar la venta o actualizar inventario: ", error);
@@ -880,7 +1358,7 @@
                     // --- 4. Reactivar la UI ---
                     submitButton.disabled = false;
                     form.classList.remove('is-loading');
-                    submitButton.textContent = 'Guardar Venta';
+                    submitButton.textContent = 'Registrar Venta';
                 }
             });
 
@@ -905,6 +1383,7 @@
                         alert("Hubo un error al borrar el historial.");
                     }
                     await initializeInventory(); // Reinicializar con productos base
+                    await saveJsonFile(); // Actualizar el JSON en Descargas
                 } else {
                     alert('Operación cancelada.');
                 }
@@ -977,8 +1456,10 @@
                         
                         const saleContent = `
                             ${itemsTable}
+                            <p style="font-size: 0.9em; margin: 8px 0 0; color: var(--secondary-color);"><strong>Tipo de Pago:</strong> ${sale.tipoPago || 'No especificado'}</p>
                             <div class="sale-actions">
                                 <button type="button" class="share-ticket-btn" data-sale-index="${index}">Compartir Ticket</button>
+                                <button type="button" class="print-ticket-btn" data-sale-index="${index}">Imprimir</button>
                                 <button type="button" class="delete-sale-btn" data-sale-id="${sale.id}">Eliminar</button>
                             </div>
                         `;
@@ -1007,9 +1488,23 @@
                 } else if (target.classList.contains('share-ticket-btn')) {
                     const saleIndex = target.dataset.saleIndex;
                     shareTicketByIndex(saleIndex);
+                } else if (target.classList.contains('print-ticket-btn')) {
+                    const saleIndex = target.dataset.saleIndex;
+                    printTicketByIndex(saleIndex);
                 } else if (target.classList.contains('delete-sale-btn')) {
                     const saleId = parseInt(target.dataset.saleId, 10);
                     await deleteSale(saleId);
+                }
+            });
+
+            ventasListContainer.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target.classList.contains('share-ticket-btn')) {
+                    const sale = currentVentasViewSales[target.dataset.saleIndex];
+                    if (sale) shareOnWhatsApp(generateTicketText(sale));
+                } else if (target.classList.contains('print-ticket-btn')) {
+                    const sale = currentVentasViewSales[target.dataset.saleIndex];
+                    if (sale) printTicket(sale);
                 }
             });
 
@@ -1018,6 +1513,7 @@
                 if (confirm('¿Está seguro de que desea eliminar esta venta de forma permanente?')) {
                     await db.ventas.delete(saleId);
                     alert('Venta eliminada con éxito.');
+                    await saveJsonFile(); // Actualizar el JSON en Descargas
                     searchClienteBtn.click(); // Refrescar la búsqueda para actualizar la lista
                 }
             }
@@ -1034,12 +1530,13 @@
                     return;
                 }
 
-                const headers = ['Fecha', 'Cliente', 'Cedula', 'ID_Producto', 'Producto', 'Cantidad', 'Precio_USD', 'Subtotal_USD', 'Tasa_BCV', 'Subtotal_VES'];
+                const headers = ['Fecha', 'Cliente', 'Cedula', 'Tipo_Pago', 'ID_Producto', 'Producto', 'Cantidad', 'Precio_USD', 'Subtotal_USD', 'Tasa_BCV', 'Subtotal_VES'];
                 let csvContent = headers.join(',') + '\n';
 
                 allSales.forEach(sale => {
                     const cliente = `"${sale.cliente.replace(/"/g, '""')}"`; 
                     const cedula = `"${(sale.cedula || '').replace(/"/g, '""')}"`;
+                    const tipoPago = `"${(sale.tipoPago || '').replace(/"/g, '""')}"`;
                     sale.items.forEach(item => {
                         const subtotalUsd = (item.precio || 0) * item.cantidad;
                         const subtotalVes = subtotalUsd * (sale.tasaBcv || 0);
@@ -1047,6 +1544,7 @@
                             sale.fecha,
                             cliente,
                             cedula,
+                            tipoPago,
                             item.productoId,
                             `"${item.nombreProducto}"`,
                             item.cantidad,
@@ -1075,7 +1573,19 @@
                 const formattedDate = `${day}/${month}/${year}`;
                 const formattedTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-                let ticket = `*🧾 RECIBO DE COMPRA - NOHEMER*\n`;
+                const ticketEmpresa = sale.empresaName || empresaName;
+                const companyExtra = getCompanyExtraData(sale);
+                let ticket = `*RECIBO DE COMPRA*\n`;
+                ticket += `*${ticketEmpresa}*\n`;
+                if (companyExtra.rif) {
+                    ticket += `*RIF/C.I.:* ${companyExtra.rif}\n`;
+                }
+                if (companyExtra.direccion) {
+                    ticket += `*Dirección:* ${companyExtra.direccion}\n`;
+                }
+                if (companyExtra.telefono) {
+                    ticket += `*Teléfono:* ${companyExtra.telefono}\n`;
+                }
                 ticket += `-----------------------------------\n`;
                 ticket += `*Cliente:* ${sale.cliente}\n`;
                 if (sale.cedula && sale.cedula.trim() !== '') {
@@ -1084,9 +1594,10 @@
                 ticket += `*Fecha:* ${formattedDate} - ${formattedTime}\n`;
                 ticket += `*ID Transacción:* ${sale.id}\n`;
                 ticket += `*Tasa del día de la venta:* ${(sale.tasaBcv || 0).toFixed(2)} Bs.\n`;
+                ticket += `*Tipo de Pago:* ${sale.tipoPago || 'No especificado'}\n`;
                 ticket += `-----------------------------------\n\n`;
                 
-                ticket += `*🛒 DETALLE DE LA COMPRA:*\n`;
+                ticket += `*DETALLE DE LA COMPRA:*\n`;
                 sale.items.forEach(item => {
                     const subtotalUsd = (item.precio || 0) * item.cantidad;
                     ticket += `• *${item.cantidad} x ${item.nombreProducto}*\n`;
@@ -1099,18 +1610,13 @@
                 const totalVesRecalculated = (sale.totalUsd || 0) * bcvRate;
 
                 ticket += `*TOTAL EN USD (se mantiene):*\n`;
-                ticket += `*💵 $${(sale.totalUsd || 0).toFixed(2)}*\n\n`;
+                ticket += `*USD: $${(sale.totalUsd || 0).toFixed(2)}*\n\n`;
                 ticket += `*MONTO A PAGAR HOY (AJUSTADO):*\n`;
                 ticket += `(Tasa del día: ${bcvRate.toFixed(2)} Bs.)\n`;
                 ticket += `*Bs. ${totalVesRecalculated.toFixed(2)}*\n`;
 
                 ticket += `-----------------------------------\n\n`;
                 
-                ticket += `*🏦 DATOS PARA PAGO MÓVIL:*\n`;
-                ticket += `*Banco:* 0134 - Banesco\n`;
-                ticket += `*Teléfono:* 0412-2012745\n`;
-                ticket += `*C.I:* 13.528.514\n\n`;
-
                 ticket += `*DOCUMENTO NO FISCAL*\n\n`;
                 ticket += `_¡Gracias por su compra!_`;
 
@@ -1127,6 +1633,162 @@
                 if (saleToShare) {
                     const ticketText = generateTicketText(saleToShare);
                     shareOnWhatsApp(ticketText);
+                }
+            }
+
+            function printTicketByIndex(index) {
+                const saleToPrint = currentSearchResults[index];
+                if (saleToPrint) {
+                    printTicket(saleToPrint);
+                }
+            }
+
+            // --- IMPRESIÓN DE TICKET DE CAJA ---
+            function printTicket(sale) {
+                const [year, month, day] = sale.fecha.split('-');
+                const formattedDate = `${day}/${month}/${year}`;
+                const formattedTime = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: false });
+                const ticketEmpresa = sale.empresaName || empresaName;
+                const companyExtra = getCompanyExtraData(sale);
+                const totalVes = (sale.totalUsd || 0) * bcvRate;
+
+                let itemsHtml = '';
+                sale.items.forEach(item => {
+                    const subtotalUsd = (item.precio || 0) * item.cantidad;
+                    itemsHtml += `<div class="ticket-line">${item.cantidad} x ${item.nombreProducto}</div>`;
+                    itemsHtml += `<div class="ticket-line">Subtotal: $${subtotalUsd.toFixed(2)}</div>`;
+                });
+
+                printArea.innerHTML = `
+                    <div>
+                        <div class="ticket-line">RECIBO DE COMPRA</div>
+                        <div class="ticket-title">${ticketEmpresa}</div>
+                        ${companyExtra.rif ? `<div class="ticket-line">RIF/C.I.: ${companyExtra.rif}</div>` : ''}
+                        ${companyExtra.direccion ? `<div class="ticket-line">Dirección: ${companyExtra.direccion}</div>` : ''}
+                        ${companyExtra.telefono ? `<div class="ticket-line">Teléfono: ${companyExtra.telefono}</div>` : ''}
+                        <div class="ticket-line">================================</div>
+                        <div class="ticket-line">Fecha: ${formattedDate} - ${formattedTime}</div>
+                        <div class="ticket-line">ID Transacción: ${sale.id}</div>
+                        <div class="ticket-line">Cliente: ${sale.cliente}</div>
+                        ${sale.cedula ? `<div class="ticket-line">C.I./RIF: ${sale.cedula}</div>` : ''}
+                        <div class="ticket-line">Tipo de Pago: ${sale.tipoPago || 'No especificado'}</div>
+                        <div class="ticket-line">Tasa: ${(sale.tasaBcv || 0).toFixed(2)} Bs.</div>
+                        <div class="ticket-line">================================</div>
+                        <div class="ticket-title">DETALLE DE LA COMPRA</div>
+                        ${itemsHtml}
+                        <div class="ticket-line">================================</div>
+                        <div class="ticket-line">Total USD: $${(sale.totalUsd || 0).toFixed(2)}</div>
+                        <div class="ticket-line">Total Bs: ${totalVes.toFixed(2)}</div>
+                        <div class="ticket-line">================================</div>
+                        <div class="ticket-line">DOCUMENTO NO FISCAL</div>
+                        <div class="ticket-line">Gracias por su compra</div>
+                    </div>
+                `;
+                window.print();
+            }
+
+            // --- MODAL DE OPCIONES DEL TICKET ---
+            function openTicketOptions(sale) {
+                pendingTicketSale = sale;
+                const totalVes = (sale.totalUsd || 0) * bcvRate;
+                ticketOptionsTotal.textContent = `Total: $${(sale.totalUsd || 0).toFixed(2)} | ${totalVes.toFixed(2)} Bs.`;
+                ticketOptionsModal.classList.remove('hidden');
+            }
+
+            function closeTicketOptions() {
+                ticketOptionsModal.classList.add('hidden');
+                pendingTicketSale = null;
+            }
+
+            // --- PANTALLA DE VENTAS REALIZADAS (MAPEO DEL ARCHIVO JSON) ---
+            async function readJsonFromHandle() {
+                const handle = await getStoredFileHandle();
+                if (!handle) return null;
+                if (!(await ensureFilePermission(handle))) return null;
+                const file = await handle.getFile();
+                return JSON.parse(await file.text());
+            }
+
+            async function loadSalesView() {
+                ventasListContainer.innerHTML = '<p style="color: var(--secondary-color);">Consultando ventas...</p>';
+                let data = null;
+                let fromJson = true;
+                try {
+                    data = await readJsonFromHandle();
+                } catch (error) {
+                    console.warn("No se pudo leer el archivo JSON guardado:", error);
+                    data = null;
+                }
+                if (!data || !Array.isArray(data.ventas)) {
+                    fromJson = false;
+                    data = { ventas: await db.ventas.toArray() };
+                }
+                renderSalesView(data.ventas, fromJson);
+            }
+
+            function renderSalesView(sales, fromJson) {
+                ventasViewNote.textContent = fromJson
+                    ? 'Ventas mostradas desde el archivo JSON guardado.'
+                    : 'Archivo JSON no disponible; mostrando los datos de la base local. Use "Cargar desde JSON" para elegir un archivo.';
+
+                currentVentasViewSales = (sales || []).slice().sort((a, b) => (b.id || 0) - (a.id || 0));
+
+                if (currentVentasViewSales.length === 0) {
+                    ventasListContainer.innerHTML = '<p>No hay ventas registradas.</p>';
+                    return;
+                }
+
+                ventasListContainer.innerHTML = '';
+                currentVentasViewSales.forEach((sale, index) => {
+                    const [year, month, day] = sale.fecha.split('-');
+                    const formattedDate = `${day}/${month}/${year}`;
+                    const totalVes = (sale.totalUsd || 0) * bcvRate;
+
+                    let itemsHtml = '';
+                    sale.items.forEach(item => {
+                        const subtotalUsd = (item.precio || 0) * item.cantidad;
+                        itemsHtml += `<tr><td>${item.nombreProducto}</td><td>${item.cantidad}</td><td>$${subtotalUsd.toFixed(2)}</td></tr>`;
+                    });
+
+                    const record = document.createElement('div');
+                    record.className = 'sale-record';
+                    record.innerHTML = `
+                        <div class="sale-record-header">
+                            <strong>${formattedDate} - ${sale.cliente}</strong>
+                            <strong>$${(sale.totalUsd || 0).toFixed(2)} (${totalVes.toFixed(2)} Bs)</strong>
+                        </div>
+                        <table class="sales-grid" style="margin-top: 10px;">
+                            <thead><tr><th>Producto</th><th>Cant.</th><th>Subtotal USD</th></tr></thead>
+                            <tbody>${itemsHtml}</tbody>
+                        </table>
+                        <p style="font-size: 0.9em; margin: 8px 0 0; color: var(--secondary-color);">
+                            <strong>Tipo de Pago:</strong> ${sale.tipoPago || 'No especificado'} &nbsp;|&nbsp; <strong>ID:</strong> ${sale.id}
+                        </p>
+                        <div class="sale-actions">
+                            <button type="button" class="share-ticket-btn" data-sale-index="${index}">WhatsApp</button>
+                            <button type="button" class="print-ticket-btn" data-sale-index="${index}">Imprimir Ticket</button>
+                        </div>
+                    `;
+                    ventasListContainer.appendChild(record);
+                });
+            }
+
+            async function handleJsonFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                try {
+                    const data = JSON.parse(await file.text());
+                    if (data && Array.isArray(data.ventas)) {
+                        renderSalesView(data.ventas, true);
+                        ventasViewNote.textContent = 'Ventas mostradas desde el archivo JSON: ' + file.name;
+                    } else {
+                        alert('El archivo no tiene el formato esperado (debe contener un arreglo "ventas").');
+                    }
+                } catch (error) {
+                    console.error("Error al leer el archivo JSON:", error);
+                    alert('No se pudo leer el archivo JSON.');
+                } finally {
+                    jsonFileInput.value = '';
                 }
             }
 
@@ -1156,7 +1818,8 @@
                     const link = document.createElement('a');
                     const url = URL.createObjectURL(blob);
                     link.setAttribute('href', url);
-                    link.setAttribute('download', `respaldo_nohemer_${fechaArchivo}.json`);
+                    const empresaSlug = slugify(empresaName);
+                    link.setAttribute('download', `respaldo_${empresaSlug}_${fechaArchivo}.json`);
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -1193,6 +1856,7 @@
                                 await db.inventory.bulkAdd(restoredData.inventory);
                             });
                             await refreshInventoryData(); // Actualizar la UI del inventario
+                            await saveJsonFile(); // Refrescar el JSON en Descargas con los datos restaurados
                             alert(`Restauración completada con éxito. Se cargaron ${restoredData.ventas.length} ventas y ${restoredData.inventory.length} productos.`);
                         }
                     } catch (error) {
@@ -1221,10 +1885,74 @@
                     await db.inventory.where('productId').equals(productId).modify(p => { p.stock += quantity });
                     alert("Stock actualizado con éxito.");
                     await refreshInventoryData();
+                    await saveJsonFile(); // Actualizar el JSON en Descargas
                     document.getElementById('add-stock-form').reset();
                 } catch (error) {
                     console.error("Error al añadir stock:", error);
                     alert("Hubo un error al actualizar el stock.");
+                }
+            }
+
+            // --- EDITAR Y ELIMINAR PRODUCTOS DEL INVENTARIO ---
+            async function handleInventoryAction(e) {
+                const target = e.target;
+                const productId = target.dataset && target.dataset.productId;
+                if (!productId) return;
+
+                if (target.classList.contains('edit-product-btn')) {
+                    const product = await db.inventory.get(productId);
+                    if (!product) return;
+
+                    const newName = prompt(`Editar el nombre del producto (actual: "${product.productName}"):`, product.productName);
+                    if (newName === null) return;
+                    const trimmedName = newName.trim();
+                    if (!trimmedName) {
+                        alert("El nombre del producto no puede estar vacío.");
+                        return;
+                    }
+
+                    const newPriceStr = prompt(`Editar el precio en USD de "${trimmedName}" (actual: $${(product.price || 0).toFixed(2)}):`, (product.price || 0).toFixed(2));
+                    if (newPriceStr === null) return;
+                    const newPrice = parseFloat(newPriceStr.replace(',', '.'));
+                    if (!newPrice || newPrice <= 0) {
+                        alert("Precio no válido. Operación cancelada.");
+                        return;
+                    }
+
+                    const newStockStr = prompt(`Editar el stock en litros de "${trimmedName}" (actual: ${product.stock.toFixed(2)}):`, product.stock.toFixed(2));
+                    if (newStockStr === null) return;
+                    const newStock = parseFloat(newStockStr.replace(',', '.'));
+                    if (isNaN(newStock) || newStock < 0) {
+                        alert("Stock no válido. Operación cancelada.");
+                        return;
+                    }
+
+                    try {
+                        await db.inventory.update(productId, { productName: trimmedName, price: newPrice, stock: newStock });
+                        alert("Producto actualizado con éxito.");
+                        await refreshInventoryData();
+                        await saveJsonFile(); // Actualizar el JSON en Descargas
+                    } catch (error) {
+                        console.error("Error al editar producto:", error);
+                        alert("Hubo un error al editar el producto.");
+                    }
+                } else if (target.classList.contains('delete-product-btn')) {
+                    const product = await db.inventory.get(productId);
+                    if (!product) return;
+
+                    if (!confirm(`¿Está seguro de que desea eliminar "${product.productName}" del inventario?\n\nLas ventas ya registradas no se alterarán.`)) {
+                        return;
+                    }
+
+                    try {
+                        await db.inventory.delete(productId);
+                        alert(`Producto "${product.productName}" eliminado con éxito.`);
+                        await refreshInventoryData();
+                        await saveJsonFile(); // Actualizar el JSON en Descargas
+                    } catch (error) {
+                        console.error("Error al eliminar producto:", error);
+                        alert("Hubo un error al eliminar el producto.");
+                    }
                 }
             }
 
