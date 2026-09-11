@@ -6,6 +6,10 @@
     <title>Registro de Venta</title>
     <style>
         /* Estilos base y mobile-first */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         :root {
             --primary-color: #007bff;
             --background-color: #f4f7f6;
@@ -40,6 +44,7 @@
 
         .container {
             max-width: 500px;
+            width: 100%;
             margin: 0 auto;
             background-color: var(--input-bg-color);
             padding: 20px;
@@ -135,6 +140,8 @@
             text-align: left;
             padding: 12px;
             border-bottom: 1px solid var(--border-color);
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .sales-grid th {
@@ -155,6 +162,7 @@
             margin-top: 10px;
             text-align: right;
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             justify-content: flex-end;
         }
@@ -208,6 +216,7 @@
 
         .inventory-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 6px;
             justify-content: flex-end;
         }
@@ -294,8 +303,10 @@
 
         .sale-record-header {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
+            gap: 6px;
             margin-bottom: 10px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border-color);
@@ -378,6 +389,7 @@
         /* Estilos para la navegación de pestañas */
         .nav-tabs {
             display: flex;
+            flex-wrap: wrap;
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 20px;
         }
@@ -387,6 +399,8 @@
             border: none;
             background-color: transparent;
             color: var(--secondary-color);
+            white-space: nowrap;
+            flex: 1 1 auto;
         }
         .nav-tab.active {
             border-bottom: 2px solid var(--primary-color);
@@ -438,6 +452,36 @@
 
         .modal-overlay.hidden {
             display: none !important;
+        }
+
+        /* Ajustes responsive para pantallas pequeñas (móviles) */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            .nav-tab {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            .modal {
+                padding: 18px;
+            }
+            .secondary-actions {
+                flex-wrap: wrap;
+            }
+            .secondary-actions button {
+                flex: 1 1 100%;
+            }
+            .sale-record-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .sale-actions {
+                justify-content: flex-start;
+            }
         }
 
         /* Área de impresión de tickets de caja */
@@ -1793,6 +1837,37 @@
             }
 
             // --- 6. FUNCIONES DE RESPALDO Y RESTAURACIÓN ---
+            // Acepta tanto el formato de respaldo de la app ({ ventas, inventory })
+            // como el archivo JSON de ventas guardado en Descargas ({ ventas, inventario, empresa, tasaDolar })
+            function normalizeRestoreData(data) {
+                if (!data || typeof data !== 'object' || Array.isArray(data) || !Array.isArray(data.ventas)) {
+                    throw new Error('El archivo no tiene el formato correcto.');
+                }
+
+                let inventory;
+                if (Array.isArray(data.inventory)) {
+                    // Formato de respaldo creado por "Crear Respaldo"
+                    inventory = data.inventory;
+                } else if (Array.isArray(data.inventario)) {
+                    // Formato del JSON de ventas guardado automáticamente en Descargas
+                    inventory = data.inventario.map(p => ({
+                        productId: String(p.producto || p.productName || '').toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''),
+                        productName: p.producto || p.productName || '',
+                        stock: typeof p.stock === 'number' ? p.stock : 0,
+                        price: typeof p.precio === 'number' ? p.precio : (typeof p.price === 'number' ? p.price : 0)
+                    })).filter(p => p.productName);
+                } else {
+                    throw new Error('El archivo no tiene el formato correcto.');
+                }
+
+                // Asegurar que cada venta tenga el campo empresaName (el JSON de ventas lo guarda como "empresa")
+                const ventas = data.ventas.map(sale => Object.assign({}, sale, {
+                    empresaName: sale.empresaName || sale.empresa || ''
+                }));
+
+                return { ventas, inventory };
+            }
+
             async function createBackup() {
                 try {
                     // Recopilar datos de ambas tablas
@@ -1841,11 +1916,7 @@
                 const reader = new FileReader();
                 reader.onload = async function(e) {
                     try {
-                        const restoredData = JSON.parse(e.target.result);
-                        // Validar que el objeto de respaldo tenga las propiedades esperadas
-                        if (typeof restoredData !== 'object' || !restoredData.hasOwnProperty('ventas') || !restoredData.hasOwnProperty('inventory')) {
-                            throw new Error("El archivo no tiene el formato correcto.");
-                        }
+                        const restoredData = normalizeRestoreData(JSON.parse(e.target.result));
 
                         if (confirm('¿Está seguro de que desea restaurar este respaldo? TODOS los datos actuales se reemplazarán.')) {
                             // Usar una transacción para asegurar que ambas operaciones se completen
