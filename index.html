@@ -140,12 +140,21 @@
             text-align: left;
             padding: 12px;
             border-bottom: 1px solid var(--border-color);
-            overflow-wrap: break-word;
-            word-break: break-word;
         }
 
         .sales-grid th {
             background-color: var(--light-bg);
+            white-space: nowrap;
+        }
+
+        .table-scroll {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-scroll .sales-grid {
+            min-width: 340px;
         }
 
         .sales-grid .remove-item-btn {
@@ -197,13 +206,16 @@
 
         .edit-product-btn,
         .delete-product-btn {
-            padding: 6px 10px;
+            padding: 6px 9px;
             border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             border: none;
             color: white;
             font-weight: 600;
+            line-height: 1;
+            min-width: 34px;
+            text-align: center;
         }
 
         .edit-product-btn {
@@ -622,19 +634,21 @@
                         <button type="button" id="add-item-btn">Agregar</button>
                     </div>
     
-                    <table class="sales-grid">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Subtotal</th>
-                                <th style="text-align: right;">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sales-grid-body">
-                            <!-- Las filas de productos se agregarán aquí con JS -->
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table class="sales-grid">
+                            <thead>
+                                <tr>
+                                    <th>Prod.</th>
+                                    <th>Cant.</th>
+                                    <th>Subt.</th>
+                                    <th style="text-align: right;">Acc.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-grid-body">
+                                <!-- Las filas de productos se agregarán aquí con JS -->
+                            </tbody>
+                        </table>
+                    </div>
     
                     <div id="current-sale-total">Total: $0.00 | 0.00 Bs.</div>
     
@@ -682,19 +696,21 @@
                 <h2>Gestión de Inventario</h2>
                 
                 <!-- Tabla de Inventario -->
-                <table class="sales-grid">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Precio</th>
-                            <th>Stock (Litros)</th>
-                            <th style="text-align: right;">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventory-grid-body">
-                        <!-- Filas de inventario se agregarán aquí -->
-                    </tbody>
-                </table>
+                <div class="table-scroll">
+                    <table class="sales-grid">
+                        <thead>
+                            <tr>
+                                <th>Prod.</th>
+                                <th>P. U.</th>
+                                <th>Stock (L)</th>
+                                <th style="text-align: right;">Acc.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-grid-body">
+                            <!-- Filas de inventario se agregarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
     
                 <hr style="margin: 30px 0;">
     
@@ -1142,8 +1158,8 @@
                         <td>${p.stock.toFixed(2)}</td>
                         <td class="text-right">
                             <div class="inventory-actions">
-                                <button type="button" class="edit-product-btn" data-product-id="${p.productId}">Editar</button>
-                                <button type="button" class="delete-product-btn" data-product-id="${p.productId}">Eliminar</button>
+                                <button type="button" class="edit-product-btn" data-product-id="${p.productId}" title="Editar producto">✏️</button>
+                                <button type="button" class="delete-product-btn" data-product-id="${p.productId}" title="Eliminar producto">🗑️</button>
                             </div>
                         </td>
                     `;
@@ -1491,12 +1507,12 @@
                         // ¡CAMBIO CLAVE! Recalcular el total en VES con la tasa actual
                         const totalSaleVesRecalculated = totalSaleUsd * bcvRate;
                         
-                        let itemsTable = `<table class="sales-grid" style="margin-top: 10px;"><thead><tr><th>Producto</th><th>Cant.</th><th>Subtotal USD</th></tr></thead><tbody>`;
+                        let itemsTable = `<div class="table-scroll"><table class="sales-grid" style="margin-top: 10px;"><thead><tr><th>Prod.</th><th>Cant.</th><th>Subt. USD</th></tr></thead><tbody>`;
                         sale.items.forEach(item => {
                             const subtotalUsd = (item.precio || 0) * item.cantidad;
                             itemsTable += `<tr><td>${item.nombreProducto}</td><td>${item.cantidad}</td><td>$${subtotalUsd.toFixed(2)}</td></tr>`;
                         });
-                        itemsTable += `</tbody></table>`;
+                        itemsTable += `</tbody></table></div>`;
                         
                         const saleContent = `
                             ${itemsTable}
@@ -1801,10 +1817,12 @@
                             <strong>${formattedDate} - ${sale.cliente}</strong>
                             <strong>$${(sale.totalUsd || 0).toFixed(2)} (${totalVes.toFixed(2)} Bs)</strong>
                         </div>
+                        <div class="table-scroll">
                         <table class="sales-grid" style="margin-top: 10px;">
-                            <thead><tr><th>Producto</th><th>Cant.</th><th>Subtotal USD</th></tr></thead>
+                            <thead><tr><th>Prod.</th><th>Cant.</th><th>Subt. USD</th></tr></thead>
                             <tbody>${itemsHtml}</tbody>
                         </table>
+                        </div>
                         <p style="font-size: 0.9em; margin: 8px 0 0; color: var(--secondary-color);">
                             <strong>Tipo de Pago:</strong> ${sale.tipoPago || 'No especificado'} &nbsp;|&nbsp; <strong>ID:</strong> ${sale.id}
                         </p>
