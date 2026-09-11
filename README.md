@@ -1,5 +1,6 @@
 # NoheMer_V1.1
 Antes de comenzar solo coloca la taza actual del Dolar$
+
 Control Inventario
 Características y Componentes Principales
 
